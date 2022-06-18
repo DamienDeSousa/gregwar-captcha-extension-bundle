@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        https://symfony.com/schema/dic/services/services-1.0.xsd">
+    <parameters>
+        <parameter key="security.captcha.security_key">captcha</parameter>
+    </parameters>
+    <services>
+        <!--    SECURITY SERVICES    -->
+        <service id="dades_gregwar_captcha_extension.security_admin_login_captcha" class="Dades\GregwarCaptchaExtensionBundle\Security\Admin\Login\Captcha">
+            <argument>%security.captcha.security_key%</argument>
+        </service>
+
+
+
+        <!--    VALIDATORS    -->
+        <service id="dades_gregwar_captcha_extension.validator_captcha" class="Dades\GregwarCaptchaExtensionBundle\Validator\Captcha\CaptchaValidator">
+            <argument type="service" id="session"/>
+            <argument type="service" id="dades_gregwar_captcha_extension.security_admin_login_captcha"/>
+        </service>
+
+
+
+        <!--    DECORATORS    -->
+        <service id="Dades\GregwarCaptchaExtensionBundle\Decorator\Security\Admin\CaptchaLoginFormDecorator" decorates="dades_fos_user_extension.security_admin_login_authentificator">
+            <argument type="service" id="dades_gregwar_captcha_extension.validator_captcha"/>
+            <argument type="service" id="dades_gregwar_captcha_extension.security_admin_login_captcha"/>
+            <argument type="service" id=".inner"/>
+        </service>
+
+
+
+        <!--    REWRITES    -->
+        <service id="gregwar_captcha.generator" class="Dades\GregwarCaptchaExtensionBundle\Rewrite\Gregwar\CaptchaBundle\Generator\CaptchaGenerator">
+            <argument type="service" id="dades_gregwar_captcha_extension.security_admin_login_captcha"/>
+            <argument type="service" id="router"/>
+            <argument type="service" id="gregwar_captcha.captcha_builder"/>
+            <argument type="service" id="gregwar_captcha.phrase_builder"/>
+            <argument type="service" id="gregwar_captcha.image_file_handler"/>
+            <argument type="service" id="session"/>
+        </service>
+    </services>
+</container>
